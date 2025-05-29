@@ -1,5 +1,5 @@
 # Use pre-built Qt6 image as base for both building and runtime
-FROM stateoftheartio/qt6:6.8-gcc-aqt AS release
+FROM stateoftheartio/qt6:6.8-macos-aqt AS release
 
 # Switch to root for package installation
 USER root
