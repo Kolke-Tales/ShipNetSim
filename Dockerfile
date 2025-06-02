@@ -1,5 +1,6 @@
 # Use pre-built Qt6 image as base for both building and runtime
-FROM stateoftheartio/qt6:6.8-macos-aqt AS release
+# This image is based on Ubuntu 20.04 with Qt6 installed via AQT for MacOS
+FROM --platform=linux/arm64 stateoftheartio/qt6:6.8-gcc-aqt
 
 # Switch to root for package installation
 USER root
@@ -126,6 +127,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g \
     # Software rendering support
     libosmesa6 \
+    libgl1-mesa-dri \
     # Locale support
     locales \
     && rm -rf /var/lib/apt/lists/*

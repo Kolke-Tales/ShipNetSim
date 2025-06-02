@@ -125,6 +125,7 @@ setup_macos_x11() {
     # Use network connection instead
     echo "🔗 Using network connection method"
     DISPLAY_VAR="$IP:0"
+    export DISPLAY="$DISPLAY_VAR" # Set DISPLAY variable for Docker container
     DOCKER_ARGS="--add-host=host.docker.internal:host-gateway"
     CONNECTION_METHOD="network"
     
@@ -348,9 +349,9 @@ check_docker() {
 
 # Function to check if image exists
 check_image() {
-    if ! docker image inspect shipnetsim:latest >/dev/null 2>&1; then
-        echo "❌ Docker image 'shipnetsim:latest' not found"
-        echo "   Build it first with: docker build -t shipnetsim:latest ."
+    if ! docker image inspect shipnetsim:sayan_arm64 >/dev/null 2>&1; then
+        echo "❌ Docker image 'shipnetsim:sayan_arm64' not found"
+        echo "   Build it first with: docker build -t shipnetsim:sayan_arm64 ."
         exit 1
     fi
 }
@@ -411,6 +412,7 @@ main() {
     docker_cmd="$docker_cmd -e QT_QPA_PLATFORM_PLUGIN_PATH=/opt/Qt/6.8.0/gcc_64/plugins/platforms"
     docker_cmd="$docker_cmd -e XDG_RUNTIME_DIR=/tmp"
     docker_cmd="$docker_cmd -e QT_LOGGING_RULES=\"*.debug=false;qt.qpa.xcb.debug=false\""
+    docker_cmd="$docker_cmd -e LIBGL_ALWAYS_SOFTWARE=1"
     
     # Set locale for Qt
     docker_cmd="$docker_cmd -e LANG=C.UTF-8"
@@ -424,12 +426,17 @@ main() {
         docker_cmd="$docker_cmd $DOCKER_ARGS"
     fi
     
-    docker_cmd="$docker_cmd --network host"
-    docker_cmd="$docker_cmd --name shipnetsim-gui"
-    docker_cmd="$docker_cmd shipnetsim:latest"
+    docker_cmd="$docker_cmd \
+    -e DISPLAY=$DISPLAY_VAR \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    --network host"
+    docker_cmd="$docker_cmd --name shipnetsim-gui-$(date +%s)" # Unique container name to avoid conflicts
+    docker_cmd="$docker_cmd shipnetsim:sayan_arm64"
     
     # Use the startup script for GUI applications (this handles Xvfb internally)
-    docker_cmd="$docker_cmd start-gui.sh ./ShipNetSimGUI"
+    #docker_cmd="$docker_cmd start-gui.sh ./ShipNetSimGUI"
+    # Directly run the GUI application
+    docker_cmd="$docker_cmd ./ShipNetSimGUI"
     
     echo "🎯 Docker command preview:"
     echo "   Using headless rendering with virtual X server"

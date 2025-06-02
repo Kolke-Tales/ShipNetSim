@@ -114,7 +114,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "-?" ]]; then
     docker run --rm \
         -v "$DATA_DIR":/app/local_data \
         -v "$OUTPUT_DIR":/app/output \
-        shipnetsim:latest \
+        shipnetsim:sayan \
         ./ShipNetSim --help
     exit 0
 fi
@@ -287,5 +287,5 @@ docker run --rm -it \
     -v "$DATA_DIR":/app/local_data \
     -v "$OUTPUT_DIR":/app/output \
     --name shipnetsim-cli \
-    shipnetsim:latest \
+    shipnetsim:sayan \
     sh -c "./ShipNetSim$CMD_ARGS"
